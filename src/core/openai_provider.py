@@ -4,7 +4,7 @@ from openai import OpenAI
 from src.core.llm_provider import LLMProvider
 
 class OpenAIProvider(LLMProvider):
-    def __init__(self, model_name: str = "gpt-4o", api_key: Optional[str] = None):
+    def __init__(self, model_name: str = "openai/gpt-oss-120b:free", api_key: Optional[str] = None):
         super().__init__(model_name, api_key)
         self.client = OpenAI(api_key=self.api_key)
 

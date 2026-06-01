@@ -54,3 +54,71 @@ The code is designed as a **Production Prototype**. It includes:
 ---
 
 *Happy Coding! Let's build agents that actually work.*
+
+---
+
+## Lab 3 Clarified Use Case (Rental Search)
+
+### User Story
+Find rental houses that are:
+- Within `distance` km from `destination`.
+- At most `price` million VND per month.
+
+### Baseline Chatbot Flow
+1. Customer asks a question.
+2. LLM reasons directly from the prompt (no explicit tools).
+3. LLM returns an answer.
+
+### ReAct Agent Flow and Tools
+Required tools:
+- `find_flat(destination, distance)`: Return all rentals where `distance_km <= distance` for a specific destination.
+- `find_max_price(price)`: Filter by monthly rent from the last `find_flat` result.
+
+Required execution order:
+1. Run `find_flat` first.
+2. Store returned list.
+3. Run `find_max_price` with the stored list and input `price`.
+4. Return final matched destinations/rentals.
+
+### Required 5 Test Cases
+
+| STT | Destination | Distance (km) | Price (million/month) | Expected Result |
+| :-- | :---------- | :------------ | :-------------------- | :-------------- |
+| 1 | VinUni | 3 | 3 | Ecohome Dang Xa, Vinhomes Ocean Park Studio |
+| 2 | HUST | 5 | 2 | Bach Khoa Dorm, Minh Khai Apartment |
+| 3 | HAUI | 8 | 1.5 | Dien Student House, Nhon Co-living |
+| 4 | PTIT | 4 | 3 | Trieu Khuc Room |
+| 5 | UET | 5 | 2.5 | Mai Dich Room, Xuan Thuy Studio |
+
+### Flowchart
+
+```mermaid
+flowchart TD
+	A[User query: destination, distance, price] --> B[ReAct Thought]
+	B --> C[Action: find_flat(destination, distance)]
+	C --> D[Observation: nearby rentals]
+	D --> E[ReAct Thought]
+	E --> F[Action: find_max_price(price)]
+	F --> G[Observation: rentals filtered by budget]
+	G --> H[Final Answer: list matched rentals]
+```
+
+### Quick Validation
+
+Run the new test suite:
+
+```bash
+pytest -q tests/test_rental_use_case.py
+```
+
+Run baseline chatbot:
+
+```bash
+python -m src.run_rental_chatbot
+```
+
+Run ReAct agent for rental use case:
+
+```bash
+python -m src.agent.agent
+```
